@@ -35,7 +35,7 @@ function App() {
 
   return (
     <div className="app-container">
-      {viewMode === ? (
+      {viewMode === 'notes' ? (
         <>
           <AppHeader />
           
