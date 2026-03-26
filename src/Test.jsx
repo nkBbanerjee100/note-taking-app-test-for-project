@@ -7,3 +7,5 @@ export default function Test() {
       <p>This will fail in Vercel</p>
 
     </div>  // ❌ Missing closing bracket below
+  )
+}
