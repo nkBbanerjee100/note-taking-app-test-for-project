@@ -1,1 +1,2 @@
 {   "buildCommand": "npm run lint && vite build",   "outputDirectory": "dist",   "framework": "vite" }
+
