@@ -5,7 +5,7 @@
  */
 
 import { useState } from 'react';
-import { appLogger } from './modules/logger.js';
+import { appLogger, Logger } from './modules/logger.js';
 import AppHeader from './components/AppHeader.jsx';
 import NoteList from './components/NoteList.jsx';
 import NoteEditor from './components/NoteEditor.jsx';
@@ -28,7 +28,9 @@ function App() {
 
   const switchView = (mode) => {
     setViewMode(mode);
-    appLogger.info(`App: Switched to ${mode} view`);
+    // appLogger.info(`App: Switched to ${mode} view`);
+    Logger.apply("log")
+    
   };
 
   return (
