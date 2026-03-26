@@ -4,12 +4,12 @@
  * Uses: NoteManager, EventSystem, Logger
  */
 
-import { useState } from 'react';
-import { appLogger, Logger } from './modules/logger.js';
-import AppHeader from './components/AppHeader.jsx';
-import NoteList from './components/NoteList.jsx';
-import NoteEditor from './components/NoteEditor.jsx';
-import CRUDDemo from './components/CRUDDemo.jsx';
+// import { useState } from 'react';
+// import { appLogger, Logger } from './modules/logger.js';
+// import AppHeader from './components/AppHeader.jsx';
+// import NoteList from './components/NoteList.jsx';
+// import NoteEditor from './components/NoteEditor.jsx';
+// import CRUDDemo from './components/CRUDDemo.jsx';
 import './App.css';
 
 function App() {
