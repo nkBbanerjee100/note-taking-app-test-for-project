@@ -11,6 +11,7 @@ import NoteList from './components/NoteList.jsx';
 import NoteEditor from './components/NoteEditor.jsx';
 import CRUDDemo from './components/CRUDDemo.jsx';
 import './App.css';
+import Test from './Test.jsx';
 
 function App() {
   const [selectedNoteId, setSelectedNoteId] = useState(null);
@@ -38,6 +39,7 @@ function App() {
       {viewMode === 'notes' ? (
         <>
           <AppHeader />
+          <Test/>
           
           <div className="view-switcher">
             <button

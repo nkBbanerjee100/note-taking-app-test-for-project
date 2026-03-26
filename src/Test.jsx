@@ -1,4 +1,4 @@
-export default function App() {
+export default function Test() {
   const name = "Vercel Test"
 
   return (
@@ -7,4 +7,3 @@ export default function App() {
       <p>This will fail in Vercel</p>
 
     </div>  // ❌ Missing closing bracket below
-    
