@@ -1,25 +1,36 @@
-/**
- * NoteEditor Component - Create and edit notes
- * Uses: NoteManager, EventSystem, Logger
- */
+// NoteEditor.jsx
+import React, { useState, useEffect, useCallback } from 'react';
+import { noteManager, eventSystem, AppEvents, appLogger } from '../utils/noteManager';
 
-import { useState, useEffect } from 'react';
-import { noteManager } from '../modules/noteManager.js';
-import { eventSystem, AppEvents } from '../modules/eventSystem.js';
-import { appLogger } from '../modules/logger.js';
-import './NoteEditor.css';
-
-export default function NoteEditor({ selectedNoteId, onNoteCreated }) {
+const NoteEditor = ({ selectedNoteId }) => {
   const [note, setNote] = useState(null);
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [newTag, setNewTag] = useState('');
   const [tags, setTags] = useState([]);
   const [isSaved, setIsSaved] = useState(true);
 
+  const loadNote = useCallback((noteId) => {
+    const loadedNote = noteManager.getNoteById(noteId);
+    if (loadedNote) {
+      setNote(loadedNote);
+      setTitle(loadedNote.title || '');
+      setContent(loadedNote.content || '');
+      setTags(loadedNote.tags || []);
+      setIsSaved(true);
+      appLogger.debug(`NoteEditor: Loaded note ${noteId}`);
+    }
+  }, []);
+
+  const resetEditor = useCallback(() => {
+    setNote(null);
+    setTitle('');
+    setContent('');
+    setTags([]);
+    setIsSaved(true);
+    appLogger.debug('NoteEditor: Reset to empty state');
+  }, []);
+
   useEffect(() => {
-    appLogger.info('NoteEditor component mounted');
-    
     if (selectedNoteId) {
       loadNote(selectedNoteId);
     } else {
@@ -27,39 +38,23 @@ export default function NoteEditor({ selectedNoteId, onNoteCreated }) {
     }
 
     // Listen for note updates from other sources
-    const unsubscribeUpdated = eventSystem.on(AppEvents.NOTE_UPDATED, (data) => {
-      if (selectedNoteId && data.id === selectedNoteId) {
-        appLogger.debug('NoteEditor: NOTE_UPDATED event received, reloading');
+    const unsubscribeUpdated = eventSystem.on(AppEvents.NOTE_UPDATED, (updatedNote) => {
+      if (selectedNoteId === updatedNote.id) {
         loadNote(selectedNoteId);
+      }
+    });
+
+    const unsubscribeDeleted = eventSystem.on(AppEvents.NOTE_DELETED, (deletedNoteId) => {
+      if (selectedNoteId === deletedNoteId) {
+        resetEditor();
       }
     });
 
     return () => {
       unsubscribeUpdated();
-      appLogger.info('NoteEditor component unmounted');
+      unsubscribeDeleted();
     };
-  }, [selectedNoteId]);
-
-  const loadNote = (noteId) => {
-    const loadedNote = noteManager.getNoteById(noteId);
-    if (loadedNote) {
-      setNote(loadedNote);
-      setTitle(loadedNote.title);
-      setContent(loadedNote.content);
-      setTags(loadedNote.tags || []);
-      setIsSaved(true);
-      appLogger.debug(`NoteEditor: Loaded note ${noteId}`);
-    }
-  };
-
-  const resetEditor = () => {
-    setNote(null);
-    setTitle('');
-    setContent('');
-    setTags([]);
-    setIsSaved(true);
-    appLogger.debug('NoteEditor: Reset to empty state');
-  };
+  }, [selectedNoteId, loadNote, resetEditor]);
 
   const handleTitleChange = (e) => {
     setTitle(e.target.value);
@@ -71,59 +66,46 @@ export default function NoteEditor({ selectedNoteId, onNoteCreated }) {
     setIsSaved(false);
   };
 
+  const handleTagsChange = (newTags) => {
+    setTags(newTags);
+    setIsSaved(false);
+  };
+
   const handleSave = () => {
-    if (!title.trim() && !content.trim()) {
-      appLogger.warn('NoteEditor: Cannot save empty note');
-      alert('Note must have at least a title or content');
+    if (!title.trim()) {
+      appLogger.warn('NoteEditor: Cannot save note without title');
       return;
     }
 
-    try {
-      if (note) {
-        // Update existing note
-        noteManager.updateNote(note.id, { title, content, tags });
-        appLogger.info(`NoteEditor: Saved existing note ${note.id}`);
-      } else {
-        // Create new note
-        const newNote = noteManager.createNote(title, content);
-        if (newNote && tags.length > 0) {
-          tags.forEach(tag => noteManager.addTag(newNote.id, tag));
-        }
-        setNote(newNote);
-        appLogger.info(`NoteEditor: Created new note ${newNote.id}`);
-        onNoteCreated(newNote.id);
-      }
-      setIsSaved(true);
-    } catch (error) {
-      appLogger.error('NoteEditor: Error saving note', error);
-      alert('Error saving note');
+    const noteData = {
+      id: note ? note.id : undefined,
+      title: title.trim(),
+      content: content.trim(),
+      tags,
+      updatedAt: new Date().toISOString(),
+    };
+
+    if (note) {
+      noteManager.updateNote(noteData);
+      eventSystem.emit(AppEvents.NOTE_UPDATED, noteData);
+    } else {
+      const newNote = noteManager.createNote(noteData);
+      eventSystem.emit(AppEvents.NOTE_CREATED, newNote);
     }
+
+    setIsSaved(true);
+    appLogger.info(`NoteEditor: Saved note ${noteData.id || 'new'}`);
   };
 
-  const handleAddTag = () => {
-    const tag = newTag.trim().toLowerCase();
-    if (tag && !tags.includes(tag)) {
-      setTags([...tags, tag]);
-      setNewTag('');
-      setIsSaved(false);
-      appLogger.debug(`NoteEditor: Added tag ${tag}`);
-    }
-  };
+  const handleDelete = () => {
+    if (!note) return;
 
-  const handleRemoveTag = (tagToRemove) => {
-    setTags(tags.filter(t => t !== tagToRemove));
-    setIsSaved(false);
-    appLogger.debug(`NoteEditor: Removed tag ${tagToRemove}`);
-  };
-
-  const handleNewNote = () => {
-    if (!isSaved && (title || content)) {
-      if (!confirm('You have unsaved changes. Create new note anyway?')) {
-        return;
-      }
+    if (window.confirm('Are you sure you want to delete this note?')) {
+      noteManager.deleteNote(note.id);
+      eventSystem.emit(AppEvents.NOTE_DELETED, note.id);
+      resetEditor();
+      appLogger.info(`NoteEditor: Deleted note ${note.id}`);
     }
-    resetEditor();
-    appLogger.info('NoteEditor: Started new note');
   };
 
   return (
@@ -131,68 +113,60 @@ export default function NoteEditor({ selectedNoteId, onNoteCreated }) {
       <div className="editor-header">
         <input
           type="text"
-          placeholder="Note title..."
+          className="title-input"
+          placeholder="Note Title"
           value={title}
           onChange={handleTitleChange}
-          className="editor-title-input"
         />
-        <span className={`save-status ${isSaved ? 'saved' : 'unsaved'}`}>
-          {isSaved ? '✓ Saved' : '● Unsaved'}
-        </span>
+        <div className="editor-actions">
+          <button
+            className="save-btn"
+            onClick={handleSave}
+            disabled={isSaved}
+          >
+            {isSaved ? 'Saved' : 'Save'}
+          </button>
+          {note && (
+            <button
+              className="delete-btn"
+              onClick={handleDelete}
+            >
+              Delete
+            </button>
+          )}
+        </div>
+      </div>
+
+      <div className="tags-section">
+        <input
+          type="text"
+          className="tags-input"
+          placeholder="Add tags (comma separated)"
+          value={tags.join(', ')}
+          onChange={(e) => handleTagsChange(e.target.value.split(',').map(tag => tag.trim()).filter(tag => tag))}
+        />
       </div>
 
       <textarea
-        placeholder="Start typing your note..."
+        className="content-textarea"
+        placeholder="Start writing your note here..."
         value={content}
         onChange={handleContentChange}
-        className="editor-content-textarea"
+        rows={20}
       />
 
-      <div className="tags-section">
-        <div className="tag-input-container">
-          <input
-            type="text"
-            placeholder="Add tag..."
-            value={newTag}
-            onChange={(e) => setNewTag(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && handleAddTag()}
-            className="tag-input"
-          />
-          <button onClick={handleAddTag} className="add-tag-btn">Add Tag</button>
-        </div>
-        
-        <div className="tags-list">
-          {tags.map(tag => (
-            <span key={tag} className="tag-badge">
-              {tag}
-              <button
-                className="remove-tag-btn"
-                onClick={() => handleRemoveTag(tag)}
-              >
-                ✕
-              </button>
-            </span>
-          ))}
-        </div>
+      <div className="editor-footer">
+        <span className="status-indicator">
+          Status: {isSaved ? 'Saved' : 'Unsaved'}
+        </span>
+        {note && (
+          <span className="note-id">
+            ID: {note.id}
+          </span>
+        )}
       </div>
-
-      <div className="editor-actions">
-        <button onClick={handleSave} className="save-btn primary">
-          {note ? 'Update Note' : 'Create Note'}
-        </button>
-        <button onClick={handleNewNote} className="new-btn secondary">
-          New Note
-        </button>
-      </div>
-
-      {note && (
-        <div className="note-meta">
-          <small>Created: {new Date(note.createdAt).toLocaleString()}</small>
-          {note.createdAt !== note.updatedAt && (
-            <small>Modified: {new Date(note.updatedAt).toLocaleString()}</small>
-          )}
-        </div>
-      )}
     </div>
   );
-}
+};
+
+export default NoteEditor;
