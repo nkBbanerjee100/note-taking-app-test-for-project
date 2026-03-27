@@ -1,36 +1,27 @@
 import React, { useState, useEffect, useRef } from 'react';
-import PropTypes from 'prop-types';
 
-export default function NoteEditor({ note, onSave }) {
-  const [text, setText] = useState(note?.text || '');
+const NoteEditor = () => {
+  const [text, setText] = useState('');
   const editorRef = useRef(null);
+  const note = { text: 'some text' };
 
   useEffect(() => {
-    setText(note?.text || '');
     editorRef.current?.focus();
-  }, [note]);
+  }, []);
 
-  const handleSave = () => {
-    onSave({ ...note, text });
-  };
+  if (note?.text) {
+    setText(note.text);
+  }
 
   return (
     <div>
       <textarea
         ref={editorRef}
         value={text}
-        onChange={e => setText(e.target.value)}
-        placeholder="Write your note here..."
+        onChange={(e) => setText(e.target.value)}
       />
-      <button onClick={handleSave}>Save</button>
     </div>
   );
-}
-
-NoteEditor.propTypes = {
-  note: PropTypes.shape({
-    id: PropTypes.string,
-    text: PropTypes.string,
-  }),
-  onSave: PropTypes.func.isRequired,
 };
+
+export default NoteEditor;
