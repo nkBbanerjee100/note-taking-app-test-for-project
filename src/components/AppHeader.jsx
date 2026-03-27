@@ -1,32 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import { noteManager, appLogger, eventSystem, AppEvents } from '../services';
+// src/components/AppHeader.jsx
+import { useEffect } from "react";
 
-const AppHeader = () => {
-  const [stats, setStats] = useState({ totalNotes: 0 });
-
-  // Define updateStats before it is used
-  const updateStats = () => {
-    const newStats = noteManager.getStatistics();
-    setStats(newStats);
-    appLogger.debug('AppHeader: Stats updated');
-  };
-
+export default function AppHeader() {
   useEffect(() => {
-    appLogger.info('AppHeader component mounted');
-    updateStats();
-    // Update stats when notes change
-    const unsubscribeCreated = eventSystem.on(AppEvents.NOTE_CREATED, updateStats);
-    return () => {
-      unsubscribeCreated();
-    };
+    // Side‑effects that do not synchronously call setState
+    const timer = setTimeout(() => {
+      // Any optional setup could go here
+    }, 0);
+    return () => clearTimeout(timer);
   }, []);
 
-  return (
-    <header className="app-header">
-      <h1>Note Taking App</h1>
-      <p>Total Notes: {stats.totalNotes}</p>
-    </header>
-  );
-};
-
-export default AppHeader;
+  return <header>App Header</header>;
+}
