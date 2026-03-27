@@ -1,23 +1,28 @@
-/**
- * NoteList Component - Displays all notes
- * Uses: NoteManager, EventSystem, Logger
- */
+// NoteList.jsx
+import React, { useState, useEffect, useCallback } from 'react';
+import { noteManager, eventSystem, AppEvents } from '../utils/noteManager';
 
-import { useState, useEffect } from 'react';
-import { noteManager } from '../modules/noteManager.js';
-import { eventSystem, AppEvents } from '../modules/eventSystem.js';
-import { appLogger } from '../modules/logger.js';
-import NoteItem from './NoteItem.jsx';
-import './NoteList.css';
-
-export default function NoteList({ onSelectNote, selectedNoteId }) {
+const NoteList = ({ onSelectNote }) => {
   const [notes, setNotes] = useState([]);
-  const [searchQuery, setSearchQuery] = useState('');
   const [filteredNotes, setFilteredNotes] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const updateFilteredNotes = useCallback((notesArray, query) => {
+    if (!query.trim()) {
+      setFilteredNotes(notesArray);
+      return;
+    }
+
+    const queryLower = query.toLowerCase();
+    const filtered = notesArray.filter(note =>
+      note.title.toLowerCase().includes(queryLower) ||
+      note.content.toLowerCase().includes(queryLower) ||
+      note.tags.some(tag => tag.toLowerCase().includes(queryLower))
+    );
+    setFilteredNotes(filtered);
+  }, []);
 
   useEffect(() => {
-    appLogger.info('NoteList component mounted');
-    
     // Load initial notes
     const loadedNotes = noteManager.getAllNotes();
     setNotes(loadedNotes);
@@ -25,21 +30,18 @@ export default function NoteList({ onSelectNote, selectedNoteId }) {
 
     // Setup event listeners
     const unsubscribeCreated = eventSystem.on(AppEvents.NOTE_CREATED, () => {
-      appLogger.debug('NoteList: NOTE_CREATED event received');
       const updatedNotes = noteManager.getAllNotes();
       setNotes(updatedNotes);
       updateFilteredNotes(updatedNotes, searchQuery);
     });
 
     const unsubscribeUpdated = eventSystem.on(AppEvents.NOTE_UPDATED, () => {
-      appLogger.debug('NoteList: NOTE_UPDATED event received');
       const updatedNotes = noteManager.getAllNotes();
       setNotes(updatedNotes);
       updateFilteredNotes(updatedNotes, searchQuery);
     });
 
     const unsubscribeDeleted = eventSystem.on(AppEvents.NOTE_DELETED, () => {
-      appLogger.debug('NoteList: NOTE_DELETED event received');
       const updatedNotes = noteManager.getAllNotes();
       setNotes(updatedNotes);
       updateFilteredNotes(updatedNotes, searchQuery);
@@ -49,58 +51,78 @@ export default function NoteList({ onSelectNote, selectedNoteId }) {
       unsubscribeCreated();
       unsubscribeUpdated();
       unsubscribeDeleted();
-      appLogger.info('NoteList component unmounted');
     };
-  }, []);
+  }, [searchQuery, updateFilteredNotes]);
 
-  const updateFilteredNotes = (notesArray, query) => {
-    if (!query.trim()) {
-      setFilteredNotes(notesArray);
-    } else {
-      const results = noteManager.searchNotes(query);
-      setFilteredNotes(results);
-    }
-  };
-
-  const handleSearch = (e) => {
+  const handleSearchChange = (e) => {
     const query = e.target.value;
     setSearchQuery(query);
     updateFilteredNotes(notes, query);
-    appLogger.debug(`NoteList search: "${query}"`);
+  };
+
+  const handleNoteClick = (note) => {
+    onSelectNote(note.id);
+  };
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
   };
 
   return (
     <div className="note-list">
-      <div className="search-container">
+      <div className="list-header">
+        <h2>All Notes ({filteredNotes.length})</h2>
         <input
           type="text"
+          className="search-input"
           placeholder="Search notes..."
           value={searchQuery}
-          onChange={handleSearch}
-          className="search-input"
+          onChange={handleSearchChange}
         />
-        <span className="note-count">{filteredNotes.length}</span>
       </div>
-      
+
       <div className="notes-container">
         {filteredNotes.length === 0 ? (
           <div className="empty-state">
-            {notes.length === 0 ? 'No notes yet. Create one!' : 'No matching notes found.'}
+            {searchQuery ? 'No notes match your search.' : 'No notes yet. Create one!'}
           </div>
         ) : (
           filteredNotes.map(note => (
-            <NoteItem
+            <div
               key={note.id}
-              note={note}
-              isSelected={selectedNoteId === note.id}
-              onSelect={() => {
-                onSelectNote(note.id);
-                appLogger.debug(`NoteList: Selected note ${note.id}`);
-              }}
-            />
+              className="note-item"
+              onClick={() => handleNoteClick(note)}
+            >
+              <div className="note-item-header">
+                <h3 className="note-title">{note.title || 'Untitled'}</h3>
+                <span className="note-date">
+                  {formatDate(note.updatedAt || note.createdAt)}
+                </span>
+              </div>
+              <p className="note-preview">
+                {note.content.substring(0, 100)}
+                {note.content.length > 100 ? '...' : ''}
+              </p>
+              <div className="note-tags">
+                {note.tags.map(tag => (
+                  <span key={tag} className="tag">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
           ))
         )}
       </div>
     </div>
   );
-}
+};
+
+export default NoteList;
