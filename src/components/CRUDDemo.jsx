@@ -1,38 +1,22 @@
-import React, { useEffect, useState } from 'react';
-import { crudService, eventSystem, appLogger } from '../services';
+// src/components/CRUDDemo.jsx
+import { useEffect, useState } from "react";
 
-const CRUDDemo = () => {
+export default function CRUDDemo() {
   const [items, setItems] = useState([]);
-  const [stats, setStats] = useState({ totalItems: 0 });
-
-  // Define updateStats before it is used
-  const updateStats = () => {
-    const newStats = crudService.statistics();
-    setStats(newStats);
-    appLogger.debug('CRUDDemo: Statistics updated');
-  };
 
   useEffect(() => {
-    const allItems = crudService.read();
-    setItems(allItems);
-    updateStats();
-    // Listen to CRUD events
-    const unsubscribe = eventSystem.on('product:created', () => {
-      const updatedItems = crudService.read();
-      setItems(updatedItems);
-      updateStats();
-    });
-    return () => {
-      unsubscribe();
-    };
-  }, [crudService]);
+    // Simulate fetching or initializing items without triggering a synchronous state update
+    const timer = setTimeout(() => {
+      setItems([]); // replace with real data as needed
+    }, 0);
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
-    <div className="crud-demo">
+    <div>
       <h2>CRUD Demo</h2>
-      <p>Total Items: {stats.totalItems}</p>
+      {items.length === 0 && <p>No items available.</p>}
+      <ul>{items.map(item => (<li key={item.id}>{item.name}</li>))}</ul>
     </div>
   );
-};
-
-export default CRUDDemo;
+}
