@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { noteManager } from '../utils/noteManager';
+import { noteManager } from '../modules/noteManager';
 
 function NoteList({ onSelectNote }) {
   const [notes, setNotes] = useState([]);
