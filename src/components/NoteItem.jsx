@@ -3,7 +3,6 @@
  * Uses: NoteManager, EventSystem, Logger
  */
 
-import { appLogger } from '../modules/logger.js';
 import { noteManager } from '../modules/noteManager.js';
 import './NoteItem.css';
 
