@@ -1,1 +1,1 @@
-module.exports = { e2e: { setupNodeEvents(on, config) { }, specPattern: 'cypress/e2e/**/*.{cy,spec}.{js,jsx,ts,tsx}' } }
+export default { e2e: { setupNodeEvents(on, config) { }, specPattern: 'cypress/e2e/**/*.{cy,spec}.{js,jsx,ts,tsx}' } }
