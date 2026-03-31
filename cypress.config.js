@@ -1,11 +1,1 @@
-import { defineConfig } from "cypress";
-
-export default defineConfig({
-  allowCypressEnv: false,
-
-  e2e: {
-    setupNodeEvents(on, config) {
-      // implement node event listeners here
-    },
-  },
-});
+module.exports = { e2e: { setupNodeEvents(on, config) { on('test:failure', (test, err) => { expect(test.err.message).to.contain('expected') }) } } }

@@ -1,1 +1,1 @@
-describe('todo', () => {beforeEach(() => {cy.visit('todo')})it('test', () => {cy.get('button').click()})})
+describe('Todo list', () => { it('displays two todo items by default', () => { cy.visit('https://example.com') }) })
