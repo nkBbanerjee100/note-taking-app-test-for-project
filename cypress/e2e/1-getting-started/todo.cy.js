@@ -1,1 +1,1 @@
-describe('Todo list', () => { it('displays two todo items by default', () => { cy.visit('https://example.com') }) })
+describe('Todo list', () => { it('displays two items', () => { cy.visit('https://example.com') }) })

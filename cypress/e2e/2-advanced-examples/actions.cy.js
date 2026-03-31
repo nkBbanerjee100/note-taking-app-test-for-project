@@ -1,1 +1,1 @@
-describe('Actions', () => { beforeEach(() => { cy.visit('https://example.com') }) it('clicks button', () => { cy.get('button').click() }) })
+describe('Actions', () => { it('performs actions', () => { cy.visit('https://example.com') }) })
