@@ -1,0 +1,1 @@
+describe('todo', () => {beforeEach(() => {cy.visit('todo')})it('test', () => {cy.get('button').click()})})
