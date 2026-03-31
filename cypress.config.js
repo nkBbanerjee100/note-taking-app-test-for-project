@@ -1,1 +1,1 @@
-module.exports = { e2e: { setupNodeEvents(on, config) { on('test:failure', (test, err) => { expect(test.err.message).to.contain('expected') }) } } }
+module.exports = { e2e: { setupNodeEvents(on, config) {}, specPattern: 'cypress/e2e/**/*.{cy,spec}.{js,jsx,ts,tsx}' } }
