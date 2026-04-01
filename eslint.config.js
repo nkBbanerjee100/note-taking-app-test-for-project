@@ -1,20 +1,13 @@
 import { defineConfig } from 'eslint/config';
 import js from '@eslint/js';
+import globals from 'globals';
 import reactPlugin from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
-import globals from 'globals';
 
-export default defineConfig([
+export default [
   js.configs.recommended,
   {
-    ignorePatterns: ['dist', 'cypress/videos', 'cypress/screenshots'],
-    parserOptions: {
-      ecmaVersion: 2020,
-      sourceType: 'module',
-      ecmaFeatures: {
-        jsx: true
-      }
-    },
+    ignores: ['dist', 'cypress/videos', 'cypress/screenshots'],
     languageOptions: {
       globals: {
         ...globals.browser,
@@ -27,6 +20,13 @@ export default defineConfig([
         assert: true,
         require: true,
         appLogger: true
+      },
+      parserOptions: {
+        ecmaVersion: 2020,
+        sourceType: 'module',
+        ecmaFeatures: {
+          jsx: true
+        }
       }
     },
     plugins: {
@@ -43,4 +43,4 @@ export default defineConfig([
       ]
     }
   }
-]);
+];
