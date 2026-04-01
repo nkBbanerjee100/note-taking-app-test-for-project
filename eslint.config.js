@@ -1,52 +1,36 @@
 import js from '@eslint/js';
+import react from 'eslint-plugin-react';
+import reactRefresh from '@eslint/plugin-react-refresh';
+import {defineConfig, globalIgnores} from 'eslint/config';
 import globals from 'globals';
-import reactHooks from 'eslint-plugin-react-hooks';
-import reactRefresh from 'eslint-plugin-react-refresh';
-import { defineConfig, globalIgnores } from 'eslint/config';
 
 export default defineConfig([
-  globalIgnores([
-    'dist',
-    'cypress/videos',
-    'cypress/screenshots'
-  ]),
-  {
+    globalIgnores(['dist', 'cypress/videos', 'cypress/screenshots']),
+    {
     files: ['**/*.{js,jsx}'],
-    extends: [
-      js.configs.recommended,
-      reactHooks.configs.flat.recommended,
-      reactRefresh.configs.vite
-    ],
+    extends: [js.recommended, react.configs.flat.recommended, reactRefresh.configs.vite],
     languageOptions: {
-      ecmaVersion: 2020,
-      globals: {
-        ...globals.browser,
-        Cypress: true,
-        cy: true,
-        describe: true,
-        it: true,
-        beforeEach: true,
-        context: true,
-        expect: true,
-        assert: true,
-        require: true,
-        appLogger: true
-      },
-      parserOptions: {
-        ecmaVersion: 'latest',
-        ecmaFeatures: {
-          jsx: true
+        ecmaVersion: 2020,
+        globals: {
+            ...globals.browser,
+            Cypress: true,
+            cy: true,
+            describe: true,
+            it: true,
+            beforeEach: true,
+            expect: true,
+            assert: true,
+            require: true,
+            appLogger: true
         },
-        sourceType: 'module'
-      }
+        parserOptions: {
+        requireAtTopLevel: true
+    }
     },
     rules: {
-      'no-unused-vars': [
-        'error',
-        {
-          varsIgnorePattern: '^[A-Z_]'
-        }
-      ]
+        'no-unused-vars': [ 'error', {
+        argsIgnorePattern: '{\![\}]|$.[\'"].*[\'"]+$',
+        varsIgnorePattern: '^(?:Cypress|cy|describe|it|beforeEach)$'
+        } ]
     }
-  }
 ]);
