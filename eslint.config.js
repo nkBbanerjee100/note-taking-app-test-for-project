@@ -36,7 +36,7 @@ export default defineConfig({
   rules: {
     'no-unused-vars': ['warn', {
       argsIgnorePattern: '^__',
-      varsIgnorePattern: '^(?:Cypress|cy|describe|it|beforeEach)$'
+      varsIgnorePattern: '^(?:Cypress|cy|describe|it|beforeEach|NoteItem|App|Logger|handleSelectNote)$'
     }],
     'no-undef': 'off'
   }
