@@ -24,7 +24,8 @@ export default defineConfig({
       NoteList: true,
       NoteEditor: true,
       CRUDDemo: true,
-      React: true
+      React: true,
+      NoteManager: true
     },
     parserOptions: {
       ecmaVersion: 2020,
@@ -41,7 +42,7 @@ export default defineConfig({
   rules: {
     'no-unused-vars': ['warn', {
       argsIgnorePattern: '^__',
-      varsIgnorePattern: '^(?:Cypress|cy|describe|it|beforeEach|NoteItem|App|Logger|handleSelectNote|AppHeader|NoteList|NoteEditor|CRUDDemo|React)$'
+      varsIgnorePattern: '^(?:Cypress|cy|describe|it|beforeEach|NoteItem|App|Logger|handleSelectNote|AppHeader|NoteList|NoteEditor|CRUDDemo|React|NoteManager)$'
     }],
     'no-undef': 'off'
   }
