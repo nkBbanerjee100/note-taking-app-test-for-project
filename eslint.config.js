@@ -1,6 +1,6 @@
-import js from '@eslint/js';
-import globals from 'globals';
 import { defineConfig } from 'eslint/config';
+import react from 'eslint-plugin-react';
+import globals from 'globals';
 
 export default defineConfig({
   root: true,
