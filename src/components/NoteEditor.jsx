@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 
 const NoteEditor = ({ noteManager, selectedNoteId }) => {
-  const [text, setText] = useState('');
-  const [title, setTitle] = useState('');
+  const [text, setText] = React.useState('');
+  const [title, setTitle] = React.useState('');
 
-  useEffect(() => {
+  React.useEffect(() => {
     const note = noteManager.getNoteById(selectedNoteId);
     if (note) {
       setText(note.content);

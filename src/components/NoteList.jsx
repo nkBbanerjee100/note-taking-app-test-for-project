@@ -1,16 +1,16 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React from 'react';
 import { noteManager } from '../modules/noteManager';
 import { eventSystem, AppEvents } from '../modules/eventSystem';
 import NoteItem from './NoteItem';
 import './NoteList.css';
 
 function NoteList({ onSelectNote, selectedNoteId }) {
-  const [notes, setNotes] = useState([]);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [notes, setNotes] = React.useState([]);
+  const [searchQuery, setSearchQuery] = React.useState('');
+  const [loading, setLoading] = React.useState(true);
 
   // Load notes when component mounts
-  useEffect(() => {
+  React.useEffect(() => {
     const loadNotes = () => {
       try {
         setLoading(true);
@@ -40,7 +40,7 @@ function NoteList({ onSelectNote, selectedNoteId }) {
   }, []);
 
   // Memoize filtered notes to prevent unnecessary recalculations
-  const filteredNotes = useMemo(() => {
+  const filteredNotes = React.useMemo(() => {
     if (searchQuery) {
       return notes.filter(note => 
         note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -51,12 +51,12 @@ function NoteList({ onSelectNote, selectedNoteId }) {
   }, [searchQuery, notes]);
 
   // Memoize handleSearch to prevent prop changes
-  const handleSearch = useCallback((e) => {
+  const handleSearch = React.useCallback((e) => {
     setSearchQuery(e.target.value);
   }, []);
 
   // Memoize onSelectNote wrapper to prevent recreation on parent updates
-  const handleSelectNote = useCallback((noteId) => {
+  const handleSelectNote = React.useCallback((noteId) => {
     onSelectNote(noteId);
   }, [onSelectNote]);
 
@@ -85,7 +85,7 @@ function NoteList({ onSelectNote, selectedNoteId }) {
                 key={note.id}
                 note={note}
                 isSelected={selectedNoteId === note.id}
-                onSelect={() => handleSelectNote(note.id)}
+                onSelect
               />
             ))
           )}
@@ -93,6 +93,6 @@ function NoteList({ onSelectNote, selectedNoteId }) {
       )}
     </div>
   );
-}
+};
 
 export default NoteList;
