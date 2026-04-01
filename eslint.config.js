@@ -19,7 +19,8 @@ export default [
         expect: true,
         assert: true,
         require: true,
-        appLogger: true
+        appLogger: true,
+        context: true
       },
       parserOptions: {
         ecmaVersion: 2020,
@@ -40,7 +41,8 @@ export default [
           argsIgnorePattern: '^__',
           varsIgnorePattern: '^(?:Cypress|cy|describe|it|beforeEach)$'
         }
-      ]
+      ],
+      'no-undef': 'off'
     }
   }
 ];
