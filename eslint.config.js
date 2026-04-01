@@ -7,7 +7,6 @@ import globals from 'globals';
 export default defineConfig([
   js.configs.recommended,
   {
-    root: true,
     ignorePatterns: ['dist', 'cypress/videos', 'cypress/screenshots'],
     parserOptions: {
       ecmaVersion: 2020,
