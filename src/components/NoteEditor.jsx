@@ -1,4 +1,5 @@
 import React from 'react';
+import './NoteEditor.css';
 
 const NoteEditor = ({ noteManager, selectedNoteId }) => {
   const [text, setText] = React.useState('');
