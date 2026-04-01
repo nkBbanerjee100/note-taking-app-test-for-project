@@ -1,14 +1,12 @@
 import js from '@eslint/js';
-import react from 'eslint-plugin-react';
-import reactRefresh from '@eslint/plugin-react-refresh';
-import {defineConfig, globalIgnores} from 'eslint/config';
 import globals from 'globals';
+import {defineConfig, globalIgnores} from 'eslint/config';
 
 export default defineConfig([
   globalIgnores(['dist', 'cypress/videos', 'cypress/screenshots']),
   {
     files: ['**/*.{js,jsx}'],
-    extends: [js.recommended, react.configs.flat.recommended, reactRefresh.configs.vite],
+    extends: [js.recommended],
     languageOptions: {
       ecmaVersion: 2020,
       globals: {
