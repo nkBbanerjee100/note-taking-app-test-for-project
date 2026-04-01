@@ -6,7 +6,7 @@ import reactHooks from 'eslint-plugin-react-hooks';
 
 export default defineConfig({
   extends: [js.configs.recommended],
-  ignores: ['dist', 'cypress/videos', 'cypress/screenshots'],
+  ignores: ['dist', 'cypress/videos', 'cypress/screenshots', 'dist/**/*'],
   languageOptions: {
     globals: {
       ...globals.browser,
