@@ -27,7 +27,7 @@ export default defineConfig({
     }
   },
   plugins: {
-    react: true
+    react: 'react'
   },
   extends: ['eslint:recommended', 'plugin:react/recommended'],
   rules: {
