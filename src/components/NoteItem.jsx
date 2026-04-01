@@ -3,11 +3,12 @@
  * Uses: NoteManager, EventSystem, Logger
  */
 
+import React from 'react';
 import { appLogger } from '../modules/logger.js';
 import { noteManager } from '../modules/noteManager.js';
 import './NoteItem.css';
 
-export default function NoteItem({ note, isSelected, onSelect }) {
+function NoteItem({ note, isSelected, onSelect }) {
   const formatDate = (isoString) => {
     const date = new Date(isoString);
     return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -56,3 +57,5 @@ export default function NoteItem({ note, isSelected, onSelect }) {
     </div>
   );
 }
+
+export default React.memo(NoteItem);

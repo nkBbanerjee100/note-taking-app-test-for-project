@@ -4,42 +4,38 @@
  * Uses: NoteManager, EventSystem, Logger
  */
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { appLogger, Logger } from './modules/logger.js';
 import AppHeader from './components/AppHeader.jsx';
 import NoteList from './components/NoteList.jsx';
 import NoteEditor from './components/NoteEditor.jsx';
 import CRUDDemo from './components/CRUDDemo.jsx';
 import './App.css';
-import Test from './Test.jsx';
 
 function App() {
   const [selectedNoteId, setSelectedNoteId] = useState(null);
   const [viewMode, setViewMode] = useState('notes'); // 'notes' or 'crud'
 
-  const handleSelectNote = (noteId) => {
+  const handleSelectNote = useCallback((noteId) => {
     setSelectedNoteId(noteId);
     appLogger.debug(`App: Selected note ${noteId}`);
-  };
+  }, []);
 
-  const handleNoteCreated = (noteId) => {
+  const handleNoteCreated = useCallback((noteId) => {
     setSelectedNoteId(noteId);
     appLogger.debug(`App: New note created ${noteId}`);
-  };
+  }, []);
 
-  const switchView = (mode) => {
+  const switchView = useCallback((mode) => {
     setViewMode(mode);
-    // appLogger.info(`App: Switched to ${mode} view`);
     Logger.apply("log")
-    
-  };
+  }, []);
 
   return (
     <div className="app-container">
       {viewMode === 'notes' ? (
         <>
           <AppHeader />
-          <Test/>
           
           <div className="view-switcher">
             <button

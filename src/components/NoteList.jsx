@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { noteManager } from '../modules/noteManager';
+import { eventSystem, AppEvents } from '../modules/eventSystem';
+import NoteItem from './NoteItem';
+import './NoteList.css';
 
-function NoteList({ onSelectNote }) {
+function NoteList({ onSelectNote, selectedNoteId }) {
   const [notes, setNotes] = useState([]);
-  const [filteredNotes, setFilteredNotes] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
 
@@ -14,7 +16,6 @@ function NoteList({ onSelectNote }) {
         setLoading(true);
         const loadedNotes = noteManager.getAllNotes();
         setNotes(loadedNotes);
-        setFilteredNotes(loadedNotes);
       } catch (error) {
         console.error('Failed to load notes:', error);
       } finally {
@@ -24,51 +25,70 @@ function NoteList({ onSelectNote }) {
 
     loadNotes();
 
-    // Setup event listener for changes
-    const handleChange = () => loadNotes();
-    noteManager.addChangeListener(handleChange);
+    // Setup event listeners for note changes
+    const unsubscribeCreated = eventSystem.on(AppEvents.NOTE_CREATED, loadNotes);
+    const unsubscribeUpdated = eventSystem.on(AppEvents.NOTE_UPDATED, loadNotes);
+    const unsubscribeDeleted = eventSystem.on(AppEvents.NOTE_DELETED, loadNotes);
+    const unsubscribeLoaded = eventSystem.on(AppEvents.NOTES_LOADED, loadNotes);
 
-    return () => noteManager.removeChangeListener(handleChange);
+    return () => {
+      unsubscribeCreated();
+      unsubscribeUpdated();
+      unsubscribeDeleted();
+      unsubscribeLoaded();
+    };
   }, []);
 
-  useEffect(() => {
+  // Memoize filtered notes to prevent unnecessary recalculations
+  const filteredNotes = useMemo(() => {
     if (searchQuery) {
-      const filtered = notes.filter(note => 
-        note.title.toLowerCase().includes(searchQuery.toLowerCase())
+      return notes.filter(note => 
+        note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        note.content.toLowerCase().includes(searchQuery.toLowerCase())
       );
-      setFilteredNotes(filtered);
-    } else {
-      setFilteredNotes(notes);
     }
+    return notes;
   }, [searchQuery, notes]);
 
-  const handleSearch = (e) => setSearchQuery(e.target.value);
+  // Memoize handleSearch to prevent prop changes
+  const handleSearch = useCallback((e) => {
+    setSearchQuery(e.target.value);
+  }, []);
+
+  // Memoize onSelectNote wrapper to prevent recreation on parent updates
+  const handleSelectNote = useCallback((noteId) => {
+    onSelectNote(noteId);
+  }, [onSelectNote]);
 
   return (
     <div className="notes-list">
-      <h2>Your Notes</h2>
-      <div className="search-bar">
+      <h2 style={{ padding: '16px', margin: 0, borderBottom: '1px solid #e0e0e0' }}>Your Notes</h2>
+      <div className="search-container">
         <input
           type="text"
           value={searchQuery}
           onChange={handleSearch}
+          className="search-input"
           placeholder="Search notes..."
         />
+        {notes.length > 0 && <span className="note-count">{filteredNotes.length}</span>}
       </div>
       {loading ? (
-        <div>Loading notes...</div>
+        <div style={{ padding: '24px', textAlign: 'center', color: '#999' }}>Loading notes...</div>
       ) : (
         <div className="notes-container">
-          {filteredNotes.map(note => (
-            <div
-              key={note.id}
-              className="note-item"
-              onClick={() => onSelectNote(note.id)}
-            >
-              <h3>{note.title}</h3>
-              <p>{note.content.substring(0, 50)}...</p>
-            </div>
-          ))}
+          {filteredNotes.length === 0 ? (
+            <div className="empty-state">No notes found</div>
+          ) : (
+            filteredNotes.map(note => (
+              <NoteItem
+                key={note.id}
+                note={note}
+                isSelected={selectedNoteId === note.id}
+                onSelect={() => handleSelectNote(note.id)}
+              />
+            ))
+          )}
         </div>
       )}
     </div>

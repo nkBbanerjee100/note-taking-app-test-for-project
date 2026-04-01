@@ -1,25 +1,21 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 
-const NoteEditor = () => {
+const NoteEditor = ({ noteManager, selectedNoteId }) => {
   const [text, setText] = useState('');
-  const editorRef = useRef(null);
-  const note = { text: 'some text' };
+  const [title, setTitle] = useState('');
 
   useEffect(() => {
-    editorRef.current?.focus();
-  }, []);
-
-  if (note?.text) {
-    setText(note.text);
-  }
+    const note = noteManager.getNoteById(selectedNoteId);
+    if (note) {
+      setText(note.content);
+      setTitle(note.title);
+    }
+  }, [selectedNoteId]);
 
   return (
     <div>
-      <textarea
-        ref={editorRef}
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-      />
+      <input value={title} onChange={(e) => setTitle(e.target.value)} />
+      <textarea value={text} onChange={(e) => setText(e.target.value)} />
     </div>
   );
 };
