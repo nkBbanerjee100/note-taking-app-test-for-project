@@ -118,162 +118,18 @@ class NoteManager {
       storage.updateNote(id, updatedNote);
       this.notes[noteIndex] = updatedNote;
 
-      this.logger.info(`Note updated: ${id}`, { title: updatedNote.title });
+      this.logger.info(`Note updated: ${id}`, { title: updatedNote.title, contentLength: updatedNote.content.length });
       eventSystem.emit(AppEvents.NOTE_UPDATED, { id, title: updatedNote.title });
       
       return updatedNote;
     } catch (error) {
-      this.logger.error(`Failed to update note (${id})`, error);
+      this.logger.error('Failed to update note', error);
       eventSystem.emit(AppEvents.ERROR_OCCURRED, { module: 'NoteManager', error: error.message });
       return null;
     }
   }
 
-  /**
-   * Delete a note
-   */
-  deleteNote(id) {
-    try {
-      const noteIndex = this.notes.findIndex(n => n.id === id);
-      
-      if (noteIndex === -1) {
-        this.logger.warn(`Cannot delete: Note not found (${id})`);
-        return false;
-      }
-
-      const deletedNote = this.notes[noteIndex];
-      storage.deleteNote(id);
-      this.notes.splice(noteIndex, 1);
-
-      this.logger.info(`Note deleted: ${id}`, { title: deletedNote.title });
-      eventSystem.emit(AppEvents.NOTE_DELETED, { id, title: deletedNote.title });
-      
-      return true;
-    } catch (error) {
-      this.logger.error(`Failed to delete note (${id})`, error);
-      eventSystem.emit(AppEvents.ERROR_OCCURRED, { module: 'NoteManager', error: error.message });
-      return false;
-    }
-  }
-
-  /**
-   * Search notes by title or content
-   */
-  searchNotes(query) {
-    const lowerQuery = query.toLowerCase();
-    const results = this.notes.filter(note =>
-      note.title.toLowerCase().includes(lowerQuery) ||
-      note.content.toLowerCase().includes(lowerQuery)
-    );
-
-    this.logger.debug(`Search query: "${query}" found ${results.length} results`);
-    return results;
-  }
-
-  /**
-   * Get notes by tag
-   */
-  getNotesByTag(tag) {
-    const results = this.notes.filter(note => note.tags.includes(tag));
-    this.logger.debug(`Retrieved ${results.length} notes with tag: ${tag}`);
-    return results;
-  }
-
-  /**
-   * Add tag to a note
-   */
-  addTag(noteId, tag) {
-    const note = this.getNoteById(noteId);
-    if (!note) {
-      this.logger.warn(`Cannot add tag: Note not found (${noteId})`);
-      return false;
-    }
-
-    if (!note.tags) note.tags = [];
-    if (!note.tags.includes(tag)) {
-      note.tags.push(tag);
-      this.updateNote(noteId, { tags: note.tags });
-      this.logger.info(`Tag added to note ${noteId}: ${tag}`);
-      return true;
-    }
-    
-    return false;
-  }
-
-  /**
-   * Remove tag from a note
-   */
-  removeTag(noteId, tag) {
-    const note = this.getNoteById(noteId);
-    if (!note) {
-      this.logger.warn(`Cannot remove tag: Note not found (${noteId})`);
-      return false;
-    }
-
-    if (note.tags && note.tags.includes(tag)) {
-      note.tags = note.tags.filter(t => t !== tag);
-      this.updateNote(noteId, { tags: note.tags });
-      this.logger.info(`Tag removed from note ${noteId}: ${tag}`);
-      return true;
-    }
-
-    return false;
-  }
-
-  /**
-   * Get note statistics
-   */
-  getStatistics() {
-    const stats = {
-      totalNotes: this.notes.length,
-      totalCharacters: this.notes.reduce((sum, note) => sum + (note.content || '').length, 0),
-      totalWords: this.notes.reduce((sum, note) => sum + (note.content || '').split(/\s+/).filter(w => w).length, 0),
-      avgWordsPerNote: 0,
-      oldestNote: null,
-      newestNote: null,
-      allTags: []
-    };
-
-    if (stats.totalNotes > 0) {
-      stats.avgWordsPerNote = Math.round(stats.totalWords / stats.totalNotes);
-      
-      const sortedByDate = [...this.notes].sort((a, b) =>
-        new Date(a.createdAt) - new Date(b.createdAt)
-      );
-      stats.oldestNote = sortedByDate[0];
-      stats.newestNote = sortedByDate[sortedByDate.length - 1];
-      
-      stats.allTags = [...new Set(this.notes.flatMap(n => n.tags || []))];
-    }
-
-    this.logger.debug('Statistics generated', stats);
-    return stats;
-  }
-
-  /**
-   * Generate unique ID
-   */
   generateId() {
-    return `note_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-  }
-
-  /**
-   * Clear all notes
-   */
-  clearAll() {
-    try {
-      storage.clearAllNotes();
-      this.notes = [];
-      this.logger.info('All notes cleared');
-      return true;
-    } catch (error) {
-      this.logger.error('Failed to clear all notes', error);
-      return false;
-    }
+    // implement id generation logic here
   }
 }
-
-// Create global note manager instance
-const noteManager = new NoteManager();
-
-export { NoteManager, noteManager };
