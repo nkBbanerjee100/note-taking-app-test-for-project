@@ -42,7 +42,7 @@ export default defineConfig({
   rules: {
     'no-unused-vars': ['warn', {
       argsIgnorePattern: '^__',
-      varsIgnorePattern: '^(?:Cypress|cy|describe|it|beforeEach|NoteItem|App|Logger|handleSelectNote|AppHeader|NoteList|NoteEditor|CRUDDemo|React|NoteManager)$'
+      varsIgnorePattern: '^(?:Cypress|cy|describe|it|beforeEach|NoteItem|App|Logger|handleSelectNote|AppHeader|NoteList|NoteEditor|CRUDDemo|React|NoteManager|ViewSwitcher)$'
     }],
     'no-undef': 'off'
   }
