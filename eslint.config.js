@@ -40,6 +40,8 @@ export default defineConfig({
     'react-hooks': reactHooks
   },
   rules: {
+    'react/jsx-uses-react': 'error',
+    'react/jsx-uses-vars': 'error',
     'no-unused-vars': ['warn', {
       argsIgnorePattern: '^__',
       varsIgnorePattern: '^(?:Cypress|cy|describe|it|beforeEach|NoteItem|App|Logger|handleSelectNote|AppHeader|NoteList|NoteEditor|CRUDDemo|React|NoteManager|ViewSwitcher)$'
