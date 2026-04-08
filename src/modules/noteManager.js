@@ -1,23 +1,12 @@
 import { appLogger } from './logger.js';
 import { eventSystem, AppEvents } from './eventSystem.js';
 import { storage } from './storage.js';
-
-const normalizeTags = (tags = []) => {
-  if (!Array.isArray(tags)) {
-    return [];
-  }
-
-  return [...new Set(
-    tags
-      .map((tag) => String(tag).trim())
-      .filter(Boolean)
-  )];
-};
-
-const countWords = (text = '') => {
-  const trimmed = text.trim();
-  return trimmed ? trimmed.split(/\s+/).length : 0;
-};
+import {
+  countWords,
+  matchesSearchQuery,
+  normalizeNotePayload,
+  sortNotesByUpdatedAt,
+} from './noteUtils.js';
 
 class NoteManager {
   constructor() {
@@ -32,10 +21,7 @@ class NoteManager {
   }
 
   getAllNotes() {
-    return storage
-      .getNotes()
-      .slice()
-      .sort((left, right) => new Date(right.updatedAt) - new Date(left.updatedAt));
+    return sortNotesByUpdatedAt(storage.getNotes());
   }
 
   getNoteById(id) {
@@ -44,14 +30,14 @@ class NoteManager {
 
   createNote(title = 'Untitled', content = '', tags = []) {
     const now = new Date().toISOString();
-    const note = {
+    const note = normalizeNotePayload({
       id: this.generateId(),
-      title: String(title).trim() || 'Untitled',
-      content: String(content),
-      tags: normalizeTags(tags),
+      title,
+      content,
+      tags,
       createdAt: now,
       updatedAt: now,
-    };
+    });
 
     const saved = storage.addNote(note);
     if (!saved) {
@@ -70,14 +56,11 @@ class NoteManager {
       return null;
     }
 
-    const updatedNote = {
-      ...existingNote,
+    const updatedNote = normalizeNotePayload({
+      existingNote,
       ...updates,
-      title: String(updates.title ?? existingNote.title).trim() || 'Untitled',
-      content: String(updates.content ?? existingNote.content ?? ''),
-      tags: normalizeTags(updates.tags ?? existingNote.tags ?? []),
       updatedAt: new Date().toISOString(),
-    };
+    });
 
     const saved = storage.updateNote(id, updatedNote);
     if (!saved) {
@@ -99,18 +82,7 @@ class NoteManager {
   }
 
   searchNotes(query = '') {
-    const normalizedQuery = String(query).trim().toLowerCase();
-    const notes = this.getAllNotes();
-
-    if (!normalizedQuery) {
-      return notes;
-    }
-
-    return notes.filter((note) =>
-      note.title.toLowerCase().includes(normalizedQuery) ||
-      note.content.toLowerCase().includes(normalizedQuery) ||
-      (note.tags || []).some((tag) => tag.toLowerCase().includes(normalizedQuery))
-    );
+    return this.getAllNotes().filter((note) => matchesSearchQuery(note, query));
   }
 
   getNotesByTag(tag) {

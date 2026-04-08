@@ -1,54 +1,10 @@
 import React from 'react';
-import { noteManager } from '../modules/noteManager';
-import { eventSystem, AppEvents } from '../modules/eventSystem';
 import NoteItem from './NoteItem';
+import { useNotesList } from '../hooks/useNotesList.js';
 import './NoteList.css';
 
 function NoteList({ onSelectNote, selectedNoteId }) {
-  const [notes, setNotes] = React.useState([]);
-  const [searchQuery, setSearchQuery] = React.useState('');
-  const [loading, setLoading] = React.useState(true);
-
-  // Load notes when component mounts
-  React.useEffect(() => {
-    const loadNotes = () => {
-      try {
-        setLoading(true);
-        const loadedNotes = noteManager.getAllNotes();
-        setNotes(loadedNotes);
-      } catch (error) {
-        console.error('Failed to load notes:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadNotes();
-
-    // Setup event listeners for note changes
-    const unsubscribeCreated = eventSystem.on(AppEvents.NOTE_CREATED, loadNotes);
-    const unsubscribeUpdated = eventSystem.on(AppEvents.NOTE_UPDATED, loadNotes);
-    const unsubscribeDeleted = eventSystem.on(AppEvents.NOTE_DELETED, loadNotes);
-    const unsubscribeLoaded = eventSystem.on(AppEvents.NOTES_LOADED, loadNotes);
-
-    return () => {
-      unsubscribeCreated();
-      unsubscribeUpdated();
-      unsubscribeDeleted();
-      unsubscribeLoaded();
-    };
-  }, []);
-
-  // Memoize filtered notes to prevent unnecessary recalculations
-  const filteredNotes = React.useMemo(() => {
-    if (searchQuery) {
-      return notes.filter(note => 
-        note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        note.content.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-    return notes;
-  }, [searchQuery, notes]);
+  const { notes, filteredNotes, loading, searchQuery, setSearchQuery } = useNotesList();
 
   // Memoize handleSearch to prevent prop changes
   const handleSearch = React.useCallback((e) => {

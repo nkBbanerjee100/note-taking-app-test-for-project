@@ -10,6 +10,7 @@ import AppHeader from './components/AppHeader.jsx';
 import NoteList from './components/NoteList.jsx';
 import NoteEditor from './components/NoteEditor.jsx';
 import CRUDDemo from './components/CRUDDemo.jsx';
+import ViewSwitcher from './components/ViewSwitcher.jsx';
 import './App.css';
 
 function App() {
@@ -37,20 +38,7 @@ function App() {
         <>
           <AppHeader />
           
-          <div className="view-switcher">
-            <button
-              className="switcher-btn active"
-              onClick={() => switchView('notes')}
-            >
-              📝 Notes
-            </button>
-            <button
-              className="switcher-btn"
-              onClick={() => switchView('crud')}
-            >
-              🔄 CRUD Demo
-            </button>
-          </div>
+          <ViewSwitcher viewMode={viewMode} onSwitch={switchView} />
 
           <div className="app-content">
             <div className="sidebar">
@@ -72,20 +60,7 @@ function App() {
         <>
           <AppHeader />
           
-          <div className="view-switcher">
-            <button
-              className="switcher-btn"
-              onClick={() => switchView('notes')}
-            >
-              📝 Notes
-            </button>
-            <button
-              className="switcher-btn active"
-              onClick={() => switchView('crud')}
-            >
-              🔄 CRUD Demo
-            </button>
-          </div>
+          <ViewSwitcher viewMode={viewMode} onSwitch={switchView} />
 
           <div className="crud-container">
             <CRUDDemo />

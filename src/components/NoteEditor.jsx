@@ -1,43 +1,17 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { noteManager } from '../modules/noteManager';
+import React from 'react';
+import { useNoteEditor } from '../hooks/useNoteEditor.js';
 import './NoteEditor.css';
 
 const NoteEditor = ({ selectedNoteId, onNoteCreated }) => {
-  const [text, setText] = useState('');
-  const [title, setTitle] = useState('');
-  const editorRef = useRef(null);
-
-  // Load note content when selectedNoteId changes
-  useEffect(() => {
-    if (selectedNoteId) {
-      const note = noteManager.getNoteById(selectedNoteId);
-      if (note) {
-        setText(note.content);
-        setTitle(note.title);
-      }
-    } else {
-      setText('');
-      setTitle('');
-    }
-  }, [selectedNoteId]);
-
-  // Focus editor when it mounts
-  useEffect(() => {
-    editorRef.current?.focus();
-  }, []);
-
-  const handleSave = () => {
-    if (selectedNoteId) {
-      noteManager.updateNote(selectedNoteId, { title, content: text });
-    }
-  };
-
-  const handleCreateNew = () => {
-    const newNote = noteManager.createNote(title || 'Untitled', text);
-    if (onNoteCreated) {
-      onNoteCreated(newNote.id);
-    }
-  };
+  const {
+    editorRef,
+    text,
+    title,
+    setText,
+    setTitle,
+    handleSave,
+    handleCreateNew,
+  } = useNoteEditor({ selectedNoteId, onNoteCreated });
 
   return (
     <div className="note-editor">
