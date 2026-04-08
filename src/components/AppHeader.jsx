@@ -1,5 +1,5 @@
 // src/components/AppHeader.jsx
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 
 export default function AppHeader() {
   useEffect(() => {

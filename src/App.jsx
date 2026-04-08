@@ -4,8 +4,8 @@
  * Uses: NoteManager, EventSystem, Logger
  */
 
-import { useState, useCallback } from 'react';
-import { appLogger, Logger } from './modules/logger.js';
+import React, { useState, useCallback } from 'react';
+import { appLogger } from './modules/logger.js';
 import AppHeader from './components/AppHeader.jsx';
 import NoteList from './components/NoteList.jsx';
 import NoteEditor from './components/NoteEditor.jsx';
@@ -28,7 +28,7 @@ function App() {
 
   const switchView = useCallback((mode) => {
     setViewMode(mode);
-    Logger.apply("log")
+    appLogger.info(`App view switched to ${mode}`);
   }, []);
 
   return (

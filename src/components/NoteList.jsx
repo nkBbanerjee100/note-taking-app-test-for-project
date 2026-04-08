@@ -85,7 +85,7 @@ function NoteList({ onSelectNote, selectedNoteId }) {
                 key={note.id}
                 note={note}
                 isSelected={selectedNoteId === note.id}
-                onSelect
+                onSelect={() => handleSelectNote(note.id)}
               />
             ))
           )}

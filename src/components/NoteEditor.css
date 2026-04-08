@@ -191,48 +191,18 @@
 
 .save-btn.primary:hover {
   background: #5568d3;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
 
-.new-btn.secondary {
+.save-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.new-btn {
   background: #f0f0f0;
-  color: #333;
-  border: 1px solid #e0e0e0;
+  color: #666;
 }
 
-.new-btn.secondary:hover {
-  background: #e8e8e8;
-}
-
-/* Note Meta */
-.note-meta {
-  display: flex;
-  gap: 24px;
-  padding-top: 12px;
-  border-top: 1px solid #e0e0e0;
-  color: #999;
-  font-size: 12px;
-}
-
-.note-meta small {
-  display: block;
-}
-
-/* Scrollbar */
-.note-editor::-webkit-scrollbar {
-  width: 8px;
-}
-
-.note-editor::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.note-editor::-webkit-scrollbar-thumb {
-  background: #ddd;
-  border-radius: 4px;
-}
-
-.note-editor::-webkit-scrollbar-thumb:hover {
-  background: #bbb;
+.new-btn:hover {
+  background: #e0e0e0;
 }
