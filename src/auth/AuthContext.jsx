@@ -35,7 +35,6 @@ export function AuthProvider({ children }) {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Login failed');
-
       localStorage.setItem('auth_token', data.token);
       setCurrentUser(data.user);
       appLogger.info(`Login success: ${data.user.username}`);
@@ -57,7 +56,6 @@ export function AuthProvider({ children }) {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Signup failed');
-
       localStorage.setItem('auth_token', data.token);
       setCurrentUser(data.user);
       appLogger.info(`Signup success: ${data.user.username}`);
@@ -84,6 +82,5 @@ export function AuthProvider({ children }) {
 
 export function useAuth() {
   const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error('useAuth must be used inside <AuthProvider>');
   return ctx;
 }
