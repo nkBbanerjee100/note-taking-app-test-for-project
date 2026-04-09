@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useCallback, useEffect } fr
 import { appLogger } from '../modules/logger.js';
 
 const AuthContext = createContext(null);
-const API_URL = 'Http::4000/api/auth';
+const API_URL = '';
 
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
