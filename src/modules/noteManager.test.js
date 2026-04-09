@@ -1,6 +1,12 @@
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { noteManager } from './noteManager.js';
 import { eventSystem, AppEvents } from './eventSystem.js';
+
+beforeEach(() => {
+  // Clear all notes between tests to ensure isolation
+  const allNotes = noteManager.getAllNotes();
+  allNotes.forEach(note => noteManager.deleteNote(note.id));
+});
 
 describe('noteManager', () => {
   it('creates a note, persists it, and emits NOTE_CREATED', () => {
