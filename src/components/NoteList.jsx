@@ -4,7 +4,7 @@ import { useNotesList } from '../hooks/useNotesList.js';
 import './NoteList.css';
 
 function NoteList({ onSelectNote, selectedNoteId }) {
-  const { notes, filteredNotes, loading, searchQuery, setSearchQuery } = useNotesList();
+  // const { notes, filteredNotes, loading, searchQuery, setSearchQuery } = useNotesList();
 
   // Memoize handleSearch to prevent prop changes
   const handleSearch = React.useCallback((e) => {
